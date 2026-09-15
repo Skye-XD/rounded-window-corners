@@ -199,10 +199,17 @@ export function onRestacked() {
     for (const actor of global.get_window_actors()) {
         const shadow = (actor as RoundedWindowActor).rwcCustomData?.shadow;
 
-        if (!(actor.visible && shadow)) {
+        if (!shadow) {
             continue;
         }
 
+        // Deliberately not skipping hidden windows. A shadow is a foreign
+        // child of the window group, so mutter never restacks it for us and
+        // this pass is the only thing that keeps its order right. Extensions
+        // that spread or animate windows hide the actors first and restack
+        // them while hidden, and skipping those left their shadows stranded
+        // above unrelated windows until some later restack happened to catch
+        // them. Reordering a hidden actor's shadow is valid and costs nothing.
         global.windowGroup.set_child_below_sibling(shadow, actor);
     }
 }
