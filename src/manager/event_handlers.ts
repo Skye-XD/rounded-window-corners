@@ -209,8 +209,17 @@ export function onRestacked() {
         // that spread or animate windows hide the actors first and restack
         // them while hidden, and skipping those left their shadows stranded
         // above unrelated windows until some later restack happened to catch
-        // them. Reordering a hidden actor's shadow is valid and costs nothing.
-        global.windowGroup.set_child_below_sibling(shadow, actor);
+        // them. Reordering a hidden actor's shadow is valid.
+        //
+        // Only moved when out of place: this runs for every window on every
+        // restack, and each move is a remove, a re-insert and a relayout. An
+        // actor another extension has reparented is not ours to order.
+        if (
+            actor.get_parent() === global.windowGroup &&
+            shadow.get_next_sibling() !== actor
+        ) {
+            global.windowGroup.set_child_below_sibling(shadow, actor);
+        }
     }
 }
 
