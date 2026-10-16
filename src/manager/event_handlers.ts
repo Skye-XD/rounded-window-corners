@@ -76,7 +76,8 @@ function createEffect(actor: RoundedWindowActor) {
 
     const shadow = createShadow(actor);
 
-    // Bind properties of the window to the shadow actor.
+    // Bind properties of the window to the shadow actor. Opacity too: a
+    // window another extension fades out must not leave its shadow behind.
     const propertyBindings: GObject.Binding[] = [];
     for (const prop of [
         'pivot-point',
@@ -85,6 +86,7 @@ function createEffect(actor: RoundedWindowActor) {
         'scale-x',
         'scale-y',
         'visible',
+        'opacity',
     ]) {
         const binding = actor.bind_property(
             prop,
